@@ -1,2 +1,1 @@
-<h1 class="text-green-400 font-bold">Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1 class="text-4xl text-indigo-800 fs-48 font-bold">Homepage of Saho App</h1>
