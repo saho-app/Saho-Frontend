@@ -5,9 +5,11 @@
 	import type { PageData } from './$types';
 	import { Button } from '$lib/components/ui/button';
 	import { onMount } from 'svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	export let data: PageData;
 	let avatarURL: string;
+	let isEditing=false;
 
 	onMount(() => {
 		const byteCharacters = atob(data.blob.data);
@@ -41,6 +43,11 @@
 	</div>
 
 	<div class="">
+		<form method="POST" action="?/updateProfile">
+			<Label>Nickname</Label>
+			<Input bind:value=/>
+
+		</form>
 		{#if !data.user.IsArtist}
 			<h3>You are not artist. Want to change it ? Click the button</h3>
 			<form method="POST" action="?/becomeArtist">
