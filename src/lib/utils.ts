@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
+import type { RequestEvent } from "@sveltejs/kit";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -60,3 +61,7 @@ export const flyAndScale = (
         easing: cubicOut
     };
 };
+
+export function handleAuthRedirect(event: RequestEvent, message: string = "You must be signed in before you may do this"): string {
+    return `/auth?redirectTo=${event.url.pathname}${event.url.search}&message=${message}`
+}
