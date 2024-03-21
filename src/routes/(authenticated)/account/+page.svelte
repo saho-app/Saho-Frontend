@@ -18,7 +18,6 @@
 	let isEditing = false;
 	let avatarDialogOpened = false;
 
-	const image = new FileWrapper();
 	let inputWrapper = new FileWrapper();
 
 	onMount(() => {
