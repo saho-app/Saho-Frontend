@@ -23,7 +23,7 @@ export const actions: Actions = {
 
         return fail(400, { message: await res.json() })
     },
-    likeSong: async ({ request }) => {
+    likeSong: async ({ request, fetch }) => {
         const data = Object.fromEntries(await request.formData())
 
         // validation
@@ -33,7 +33,7 @@ export const actions: Actions = {
             return
         }
     },
-    unlikeSong: async ({ request }) => {
+    unlikeSong: async ({ request, fetch }) => {
         const data = Object.fromEntries(await request.formData())
 
         // validation
@@ -43,7 +43,7 @@ export const actions: Actions = {
             return
         }
     },
-    editSong: async ({ request }) => {
+    editSong: async ({ request, fetch }) => {
         const formData = Object.fromEntries(await request.formData())
         const body = { Title: formData.Title, IsPrivate: formData.IsPrivate == 'true', HasCover: false }
         // validation
@@ -53,7 +53,7 @@ export const actions: Actions = {
         }
         return fail(400)
     },
-    deleteSong: async ({ request }) => {
+    deleteSong: async ({ request, fetch }) => {
         const formData = Object.fromEntries(await request.formData())
         const response = await fetch(`${BackendURL}/songs/${formData.Id}`, { method: "DELETE" })
         if (response.ok) {
