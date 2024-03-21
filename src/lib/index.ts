@@ -75,3 +75,7 @@ export class Song {
 	public isPrivate: boolean = true;
 	public isLiked: boolean = false;
 };
+
+export class FileWrapper {
+	public input: HTMLInputElement | undefined;
+}

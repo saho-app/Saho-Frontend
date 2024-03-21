@@ -1,6 +1,6 @@
 import { BackendURL } from '$lib';
 import { handleAuthRedirect } from '$lib/utils';
-import { redirect } from '@sveltejs/kit';
+import { redirect, type Actions, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -17,3 +17,17 @@ export const load: PageServerLoad = async (event) => {
         accountInfo: await accountInfoResponse.json()
     };
 };
+
+export const actions: Actions = {
+    "uploadAvatar": async (event) => {
+        const formData = await event.request.formData();
+        if (!formData.get("picture")) {
+            return error(400, { message: "No file selected" })
+        }
+
+        const res = await event.fetch(`${BackendURL}/users/picture`, { method: "PUT", body: formData });
+        if (!res.ok) {
+            return error(res.status, res.status.toString())
+        }
+    }
+}
