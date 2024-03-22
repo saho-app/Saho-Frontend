@@ -8,6 +8,8 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { toast } from 'svelte-sonner';
+	import PageTitle from '$lib/components/ui/PageTitle/PageTitle.svelte';
+	import { Title } from '$lib/components/ui/dialog';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -16,8 +18,10 @@
 		if (data.message) {
 			toast.info(data.message);
 		}
-	})
+	});
 </script>
+
+<PageTitle title="Authentication" />
 
 <div
 	class="container relative hidden h-[900px] flex-col justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"

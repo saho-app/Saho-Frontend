@@ -7,7 +7,7 @@ export const BackendURL = "http://localhost:5003";
 
 export class JwtPayload {
 	public unique_name: string = "";
-	public role: string = "";
+	public role: string | string[] = "";
 	public iss: string = "";
 	public aud: string = "";
 	public iat: number = 0;
@@ -38,7 +38,10 @@ export class Auth {
 			auth.Token = token;
 			auth.Id = decoded.id;
 			auth.Expires = decoded.exp ?? 0;
-			auth.Roles = decoded.role.split(',');
+			if (typeof decoded.role === typeof "string") {
+				auth.Roles = [decoded.role as string];
+			}
+			auth.Roles = decoded.role as string[];
 		}
 		return auth;
 	}

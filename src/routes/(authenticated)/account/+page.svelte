@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Label } from '$lib/components/ui/label';
-	import { CheckCircle2, LucideEdit, X } from 'lucide-svelte';
+	import { CheckCircle2, LucideEdit, Pen, X } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import { Button } from '$lib/components/ui/button';
 	import { onMount } from 'svelte';
@@ -12,11 +12,18 @@
 	import { enhance } from '$app/forms';
 	import { type SubmitFunction } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
+	import { Trash } from 'radix-icons-svelte';
+	import PageTitle from '$lib/components/ui/PageTitle/PageTitle.svelte';
+	import NicknameEditForm from '$lib/components/ui/NicknameEditForm/NicknameEditForm.svelte';
+	import type { ActionData } from '../$types';
 
 	export let data: PageData;
+	export let form: ActionData;
 	let avatarURL: string;
-	let isEditing = false;
+	let nicknameEditing = false;
+	let showNickPen = false;
 	let avatarDialogOpened = false;
+	let loading = false;
 
 	let inputWrapper = new FileWrapper();
 
@@ -36,24 +43,39 @@
 	const onAvatarUpload: SubmitFunction = () => {
 		return async ({ result, update }) => {
 			switch (result.type) {
-				case 'error':
 				case 'failure':
 					toast.error('There was a problem with avatar uploading. Please try again');
-					await update();
 					break;
 				case 'success':
 					toast.success('Successfully changed avatar');
+					avatarDialogOpened = false;
 					if (inputWrapper.input && inputWrapper.input.files) {
 						avatarURL = URL.createObjectURL(inputWrapper.input.files[0]);
 					}
-					avatarDialogOpened = false;	
 					break;
-				default:
-					await update();
 			}
+			await update();
 		};
 	};
+
+	const onBecomeArtist:SubmitFunction = () => {
+		loading = true;
+		return async (event) => {
+			switch (event.result.type) {
+				case 'failure':
+					toast.error(`An error occured. Code: ${event.result.status}`);
+					break;
+				case 'success':
+					toast.success("Successfully updated account status");
+					break;
+			}
+			await event.update();
+			loading = false;
+		}
+	}
 </script>
+
+<PageTitle title="Account" />
 
 <div class="space-x-20">
 	<div class="flex row items-start h-80 space-x-5 border-b-2">
@@ -72,10 +94,10 @@
 						<FileDrop exportInput={inputWrapper} allowedTypes={['image/jpeg', 'image/png']} />
 						<input bind:this={inputWrapper.input} hidden name="picture" type="file" />
 						<Dialog.Footer>
-							<Button on:click={() => {}} class="bg-green-500 hover:bg-green-400" type="submit"
-								><CheckCircle2 /></Button
+							<Button class="bg-green-500 hover:bg-green-400" type="submit"
+								><CheckCircle2 size={24} /></Button
 							>
-							<Button on:click={() => (avatarDialogOpened = false)}><X /></Button>
+							<Button type="submit" formaction="?/deleteAvatar"><Trash size={24} /></Button>
 						</Dialog.Footer>
 					</form>
 				</Dialog.Content>
@@ -86,25 +108,49 @@
 				<Dialog.Trigger>
 					<Button
 						variant="outline"
-						class="bg-gray-20 absolute inset-0 opacity-0 rounded-full h-60 w-60 hover:opacity-100 border-4 border-pink-600 hover:bg-opacity-90 hover:bg-gray-200"
+						class="bg-gray-200 absolute inset-0 opacity-0 rounded-full h-60 w-60 hover:opacity-100 border-4 border-pink-600 hover:bg-opacity-80 hover:bg-gray-300"
 					>
-						<LucideEdit class="size-5" />
+						<div
+							class="rounded-full bg-white size-10 bg-opacity-80 flex items-center justify-center"
+						>
+							<LucideEdit class="size-5" />
+						</div>
 					</Button>
 				</Dialog.Trigger>
 			</Dialog.Root>
 		</div>
-		<Label class="text-8xl self-center">{data.user?.Nickname}</Label>
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div
+			class="self-center flex items-center p-5 rounded-3xl cursor-pointer {showNickPen
+				? 'bg-gray-200'
+				: ''}"
+			on:mouseover={() => (showNickPen = true)}
+			on:mouseleave={() => (showNickPen = false)}
+			on:click={() => (nicknameEditing = true)}
+		>
+			<Label class="text-8xl self-center cursor-pointer">{data.user?.Nickname}</Label>
+			<Dialog.Root bind:open={nicknameEditing}>
+				<Dialog.Content>
+					<Dialog.Header>
+						<Dialog.Title>Edit your nickname</Dialog.Title>
+					</Dialog.Header>
+					
+					<NicknameEditForm username={data.user.Nickname} onClick={() => (nicknameEditing = false)} form={form}/>
+				</Dialog.Content>
+			</Dialog.Root>
+			<div class="{showNickPen ? '' : 'opacity-0'} rounded-full p-3 ml-10 items-center self-center">
+				<Pen size={48} fill="gray" />
+			</div>
+		</div>
 	</div>
 
 	<div class="">
-		<form method="POST" action="?/updateProfile">
-			<Label>Nickname</Label>
-			<Input value={data.user.Nickname ?? ''} />
-		</form>
 		{#if !data.user.IsArtist}
 			<h3>You are not artist. Want to change it ? Click the button</h3>
-			<form method="POST" action="?/becomeArtist">
-				<Button type="submit" class="bg-pink-600">Become an artist!</Button>
+			<form method="POST" action="?/becomeArtist" use:enhance={onBecomeArtist}>
+				<Button type="submit" disabled={loading} class="bg-pink-600">Become an artist!</Button>
 			</form>
 		{/if}
 	</div>

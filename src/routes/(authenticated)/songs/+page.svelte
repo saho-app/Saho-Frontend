@@ -10,6 +10,7 @@
 	import * as Table from '$lib/components/ui/table';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
+	import PageTitle from '$lib/components/ui/PageTitle/PageTitle.svelte';
 
 	export let data: PageData;
 
@@ -33,6 +34,8 @@
 		};
 	};
 </script>
+
+<PageTitle title="Library"/>
 
 {#if data.user.Nickname != ""}
 	<form
